@@ -4633,13 +4633,30 @@ async def mark_all_notifications_read(current_user: User = Depends(get_current_u
     return {"message": "All notifications marked as read"}
 
 @api_router.get("/notifications/unread-count")
-async def get_unread_count(current_user: User = Depends(get_current_user)):
+async def get_unread_count(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False))):
     """Get count of unread notifications"""
-    count = await db.notifications.count_documents({
-        "user_id": current_user.id,
-        "read": False
-    })
-    return {"count": count}
+    # Handle unauthenticated requests gracefully
+    if not credentials:
+        return {"count": 0}
+    
+    try:
+        # Verify token
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("id")
+        
+        if not user_id:
+            return {"count": 0}
+        
+        # Count unread notifications
+        count = await db.notifications.count_documents({
+            "user_id": user_id,
+            "read": False
+        })
+        return {"count": count}
+    except (PyJWTError, Exception):
+        # Return 0 for invalid tokens instead of 401
+        return {"count": 0}
 
 
 # ============= Approval Request Endpoints =============
