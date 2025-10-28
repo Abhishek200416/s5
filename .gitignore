@@ -1,0 +1,21 @@
+# Ignore sensitive & build files
+.env
+*.pem
+*.key
+*.p12
+*.jks
+__pycache__/
+*.pyc
+*.log
+node_modules/
+build/
+dist/
+aws/
+backend/.env
+frontend/.env
+*.zip
+*.tar
+*.gz
+*.tgz
+*.deb
+*.dylib

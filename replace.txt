@@ -1,0 +1,6 @@
+***REMOVED***
+regex:\bA(K|S)IA[0-9A-Z]{16}\b==>AWS_ACCESS_KEY_ID=[REDACTED]
+***REMOVED***
+regex:(?i)\bAWS[_-]?SECRET[_-]?ACCESS[_-]?KEY\b[=: ]+[A-Za-z0-9/+=]{40}\b==>AWS_SECRET_ACCESS_KEY=[REDACTED]
+***REMOVED***
+regex:(?i)\bAWS[_-]?SESSION[_-]?TOKEN\b[=: ]+[A-Za-z0-9/+=]{20,}\b==>AWS_SESSION_TOKEN=[REDACTED]
