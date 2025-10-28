@@ -37,7 +37,7 @@ Alert Whisperer is an advanced MSP operations intelligence platform that reduces
 
 ### Base URL
 ```
-Production: https://amazing-bartik.preview.emergentagent.com/api
+Production: https://dynamofix.preview.emergentagent.com/api
 Development: http://localhost:8001/api
 ```
 
@@ -45,7 +45,7 @@ Development: http://localhost:8001/api
 All API requests require a Bearer token obtained from login:
 
 ```bash
-curl -X POST https://amazing-bartik.preview.emergentagent.com/api/auth/login \
+curl -X POST https://dynamofix.preview.emergentagent.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@alertwhisperer.com",
@@ -65,7 +65,7 @@ Response:
 Use the token in subsequent requests:
 ```bash
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-  https://amazing-bartik.preview.emergentagent.com/api/companies
+  https://dynamofix.preview.emergentagent.com/api/companies
 ```
 
 ---
@@ -111,7 +111,7 @@ Alert Whisperer accepts alerts from external monitoring tools (Prometheus, Datad
 receivers:
   - name: 'alert-whisperer'
     webhook_configs:
-      - url: 'https://amazing-bartik.preview.emergentagent.com/api/webhooks/alerts'
+      - url: 'https://dynamofix.preview.emergentagent.com/api/webhooks/alerts'
         send_resolved: true
         http_config:
           headers:
@@ -121,7 +121,7 @@ receivers:
 #### Datadog Webhook
 ```json
 {
-  "webhook_url": "https://amazing-bartik.preview.emergentagent.com/api/webhooks/alerts",
+  "webhook_url": "https://dynamofix.preview.emergentagent.com/api/webhooks/alerts",
   "payload": {
     "company_id": "comp-acme",
     "asset_name": "$HOSTNAME",
@@ -135,7 +135,7 @@ receivers:
 
 #### Curl Example
 ```bash
-curl -X POST https://amazing-bartik.preview.emergentagent.com/api/webhooks/alerts \
+curl -X POST https://dynamofix.preview.emergentagent.com/api/webhooks/alerts \
   -H "Content-Type: application/json" \
   -d '{
     "company_id": "comp-acme",
@@ -372,7 +372,7 @@ GET /api/activities?company_id=comp-acme&limit=20
 
 The React frontend is available at:
 ```
-https://amazing-bartik.preview.emergentagent.com
+https://dynamofix.preview.emergentagent.com
 ```
 
 **Demo Credentials:**

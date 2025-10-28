@@ -12,7 +12,7 @@ from datetime import datetime
 import time
 
 # Get backend URL from frontend .env file
-BACKEND_URL = "https://amazing-bartik.preview.emergentagent.com/api"
+BACKEND_URL = "https://dynamofix.preview.emergentagent.com/api"
 
 class MSPTester:
     def __init__(self):
