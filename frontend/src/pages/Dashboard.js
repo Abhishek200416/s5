@@ -240,7 +240,13 @@ const Dashboard = ({ user, onLogout }) => {
 
               {/* Company Selector */}
               <div className="ml-8 flex items-center gap-3">
-                <Select value={selectedCompany} onValueChange={setSelectedCompany}>
+                <Select 
+                  value={selectedCompany} 
+                  onValueChange={(value) => {
+                    setSelectedCompany(value);
+                    localStorage.setItem('selectedCompany', value);
+                  }}
+                >
                   <SelectTrigger className="w-[250px] bg-slate-800/50 border-slate-700 text-white" data-testid="company-selector">
                     <SelectValue placeholder="Select company" />
                   </SelectTrigger>
