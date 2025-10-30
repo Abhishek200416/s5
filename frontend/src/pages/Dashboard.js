@@ -164,17 +164,28 @@ const Dashboard = ({ user, onLogout }) => {
       const response = await api.get('/companies');
       setCompanies(response.data);
       
-      // Auto-select first company the user has access to
+      // Try to restore from localStorage first
+      const savedCompanyId = localStorage.getItem('selectedCompany');
+      
+      // Auto-select company based on saved preference or user access
       if (response.data.length > 0) {
         const userCompanyIds = user.company_ids || [];
         const userCompanies = response.data.filter(c => 
           userCompanyIds.includes(c.id)
         );
-        if (userCompanies.length > 0) {
+        
+        // If there's a saved company and it's accessible, use it
+        if (savedCompanyId && response.data.find(c => c.id === savedCompanyId)) {
+          setSelectedCompany(savedCompanyId);
+        }
+        // Otherwise, auto-select first accessible company
+        else if (userCompanies.length > 0) {
           setSelectedCompany(userCompanies[0].id);
+          localStorage.setItem('selectedCompany', userCompanies[0].id);
         } else if (response.data.length > 0) {
           // If user has no specific companies, select first available
           setSelectedCompany(response.data[0].id);
+          localStorage.setItem('selectedCompany', response.data[0].id);
         }
       }
     } catch (error) {
