@@ -211,8 +211,8 @@ const RunbookLibrary = () => {
                         {runbook.risk_level}
                       </Badge>
                     </div>
-                    <CardTitle className="text-lg" style={{ color: 'hsl(var(--card-foreground))' }}>{runbook.name}</CardTitle>
-                    <CardDescription className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                    <CardTitle className="text-lg text-white">{runbook.name}</CardTitle>
+                    <CardDescription className="text-sm text-slate-400">
                       {runbook.description}
                     </CardDescription>
                   </CardHeader>
