@@ -17,6 +17,7 @@ const IncidentList = ({ companyId, limit, refreshTrigger }) => {
   const [autoDecideConfig, setAutoDecideConfig] = useState(null);
   const [loadingConfig, setLoadingConfig] = useState(true);
   const [autoDecideStats, setAutoDecideStats] = useState(null);
+  const [technicians, setTechnicians] = useState({});
 
   useEffect(() => {
     if (companyId) {
