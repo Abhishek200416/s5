@@ -4949,7 +4949,7 @@ async def save_company_aws_credentials(
     credentials: CompanyAWSCredentials,
     current_user: User = Depends(get_current_user)
 ):
-    """Save encrypted AWS credentials for a company"""
+    """Save encrypted AWS credentials for a company - with validation"""
     if current_user.role not in ["msp_admin", "admin", "company_admin"]:
         raise HTTPException(status_code=403, detail="Insufficient permissions")
     
@@ -4958,12 +4958,48 @@ async def save_company_aws_credentials(
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     
+    # Validate credentials by testing AWS connection
+    try:
+        ec2 = boto3.client(
+            'ec2',
+            region_name=credentials.region,
+            aws_access_key_id=credentials.access_key_id,
+            aws_secret_access_key=credentials.secret_access_key
+        )
+        
+        # Test with a simple describe call
+        await asyncio.get_event_loop().run_in_executor(
+            None,
+            lambda: ec2.describe_instances(MaxResults=1)
+        )
+        logger.info(f"✅ AWS credentials validated for company {company_id}")
+        
+    except ClientError as e:
+        error_code = e.response.get('Error', {}).get('Code', '')
+        if error_code in ['AuthFailure', 'UnauthorizedOperation', 'InvalidClientTokenId']:
+            raise HTTPException(
+                status_code=401, 
+                detail="Invalid AWS credentials. Please check your Access Key ID and Secret Access Key."
+            )
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail=f"AWS Error: {str(e)}"
+            )
+    except Exception as e:
+        logger.error(f"❌ AWS credentials validation failed: {str(e)}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Failed to validate AWS credentials: {str(e)}"
+        )
+    
     # Encrypt credentials before storing
     encrypted_credentials = {
         "access_key_id": encryption_service.encrypt(credentials.access_key_id),
         "secret_access_key": encryption_service.encrypt(credentials.secret_access_key),
         "region": credentials.region,
-        "enabled": True
+        "enabled": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
     
     # Update company with encrypted credentials
@@ -4990,9 +5026,10 @@ async def save_company_aws_credentials(
     ).model_dump())
     
     return {
-        "message": "AWS credentials saved successfully",
+        "message": "AWS credentials saved and validated successfully",
         "region": credentials.region,
-        "encrypted": True
+        "encrypted": True,
+        "validated": True
     }
 
 @api_router.get("/companies/{company_id}/aws-credentials")
