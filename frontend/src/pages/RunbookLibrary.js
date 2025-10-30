@@ -269,11 +269,11 @@ const RunbookLibrary = () => {
       <Dialog open={showExecuteDialog} onOpenChange={setShowExecuteDialog}>
         <DialogContent className="bg-slate-900/95 border-slate-700/50 max-w-2xl">
           <DialogHeader>
-            <DialogTitle style={{ color: 'hsl(var(--card-foreground))' }} className="flex items-center gap-2">
+            <DialogTitle className="text-white flex items-center gap-2">
               <Play className="w-5 h-5 text-cyan-400" />
               Execute Runbook
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-slate-400">
               {selectedRunbook?.name}
             </DialogDescription>
           </DialogHeader>
@@ -281,12 +281,11 @@ const RunbookLibrary = () => {
           <div className="space-y-4">
             {/* Company Selection */}
             <div>
-              <label className="text-sm font-medium mb-2 block" style={{ color: 'hsl(var(--card-foreground))' }}>Company</label>
+              <label className="text-sm font-medium mb-2 block text-white">Company</label>
               <select
                 value={selectedCompany}
                 onChange={(e) => setSelectedCompany(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2"
-                style={{ color: 'hsl(var(--card-foreground))' }}
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"
               >
                 {companies.map(company => (
                   <option key={company.id} value={company.id}>
@@ -298,13 +297,12 @@ const RunbookLibrary = () => {
 
             {/* Instance ID */}
             <div>
-              <label className="text-sm font-medium mb-2 block" style={{ color: 'hsl(var(--card-foreground))' }}>EC2 Instance ID</label>
+              <label className="text-sm font-medium mb-2 block text-white">EC2 Instance ID</label>
               <Input
                 placeholder="e.g., i-1234567890abcdef0"
                 value={instanceId}
                 onChange={(e) => setInstanceId(e.target.value)}
-                className="bg-slate-900 border-slate-700"
-                style={{ color: 'hsl(var(--card-foreground))' }}
+                className="bg-slate-900 border-slate-700 text-white placeholder-slate-400"
               />
               <p className="text-slate-400 text-xs mt-1">
                 The instance must have SSM agent installed and running
