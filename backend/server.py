@@ -5048,15 +5048,20 @@ async def get_company_aws_credentials(
     aws_creds = company.get("aws_credentials", {})
     
     if not aws_creds or not aws_creds.get("enabled"):
-        return {
-            "configured": False,
-            "region": None
-        }
+        raise HTTPException(status_code=404, detail="AWS credentials not configured")
+    
+    # Decrypt access key for preview
+    try:
+        access_key_preview = encryption_service.decrypt(aws_creds.get("access_key_id", ""))[:8] + "..." if aws_creds.get("access_key_id") else None
+    except Exception as e:
+        logger.error(f"Failed to decrypt access key: {e}")
+        access_key_preview = "AKIA..."
     
     return {
         "configured": True,
         "region": aws_creds.get("region", "us-east-1"),
-        "access_key_id_preview": encryption_service.decrypt(aws_creds.get("access_key_id", ""))[:8] + "..." if aws_creds.get("access_key_id") else None
+        "access_key_id_preview": access_key_preview,
+        "created_at": aws_creds.get("created_at", datetime.now(timezone.utc).isoformat())
     }
 
 @api_router.delete("/companies/{company_id}/aws-credentials")
