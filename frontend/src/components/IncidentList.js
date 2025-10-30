@@ -83,8 +83,30 @@ const IncidentList = ({ companyId, limit, refreshTrigger }) => {
         data = data.slice(0, limit);
       }
       setIncidents(data);
+      
+      // Load technician details for assigned incidents
+      const assignedToIds = [...new Set(data.filter(i => i.assigned_to).map(i => i.assigned_to))];
+      if (assignedToIds.length > 0) {
+        await loadTechnicians(assignedToIds);
+      }
     } catch (error) {
       console.error('Failed to load incidents:', error);
+    }
+  };
+
+  const loadTechnicians = async (userIds) => {
+    try {
+      // Fetch all users and filter for technicians
+      const response = await api.get('/users');
+      const techMap = {};
+      response.data.forEach(user => {
+        if (userIds.includes(user.id)) {
+          techMap[user.id] = user;
+        }
+      });
+      setTechnicians(techMap);
+    } catch (error) {
+      console.error('Failed to load technicians:', error);
     }
   };
 
