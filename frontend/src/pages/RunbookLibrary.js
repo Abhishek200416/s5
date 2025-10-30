@@ -167,8 +167,7 @@ const RunbookLibrary = () => {
             placeholder="Search runbooks..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-slate-800 border-slate-700"
-            style={{ color: 'hsl(var(--card-foreground))' }}
+            className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-slate-400"
           />
         </div>
       </div>
