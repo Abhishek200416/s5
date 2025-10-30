@@ -5182,20 +5182,40 @@ async def get_instances_without_ssm(
         raise HTTPException(status_code=400, detail="AWS credentials not configured for this company")
     
     # Decrypt credentials
-    access_key_id = encryption_service.decrypt(aws_creds.get("access_key_id", ""))
-    secret_access_key = encryption_service.decrypt(aws_creds.get("secret_access_key", ""))
-    region = aws_creds.get("region", "us-east-1")
+    try:
+        access_key_id = encryption_service.decrypt(aws_creds.get("access_key_id", ""))
+        secret_access_key = encryption_service.decrypt(aws_creds.get("secret_access_key", ""))
+        region = aws_creds.get("region", "us-east-1")
+        
+        if not access_key_id or not secret_access_key:
+            raise HTTPException(status_code=400, detail="AWS credentials are invalid or corrupted")
+            
+    except Exception as e:
+        logger.error(f"Failed to decrypt AWS credentials: {e}")
+        raise HTTPException(status_code=400, detail="Failed to decrypt AWS credentials. Please update credentials.")
     
     # Get instances without SSM
-    instances = await ssm_installer_service.get_instances_without_ssm(
-        access_key_id, secret_access_key, region
-    )
+    try:
+        instances = await ssm_installer_service.get_instances_without_ssm(
+            access_key_id, secret_access_key, region
+        )
+    except ClientError as e:
+        error_code = e.response.get('Error', {}).get('Code', '')
+        if error_code in ['AuthFailure', 'UnauthorizedOperation', 'InvalidClientTokenId']:
+            raise HTTPException(
+                status_code=401, 
+                detail="Invalid AWS credentials. Please update your credentials."
+            )
+        raise HTTPException(status_code=500, detail=f"AWS Error: {str(e)}")
+    except Exception as e:
+        logger.error(f"Failed to get instances: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve instances: {str(e)}")
     
     return {
         "company_id": company_id,
         "company_name": company.get("name"),
         "region": region,
-        "instances_without_ssm": instances,
+        "instances": instances,
         "count": len(instances)
     }
 
