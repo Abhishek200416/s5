@@ -306,7 +306,10 @@ const IncidentList = ({ companyId, limit, refreshTrigger }) => {
             </div>
           ) : (
             <div className="space-y-3">
-              {incidents.map((incident) => (
+              {incidents.map((incident) => {
+                const assignedTech = incident.assigned_to ? technicians[incident.assigned_to] : null;
+                
+                return (
                 <div
                   key={incident.id}
                   className="p-4 bg-slate-800/30 rounded-lg border border-slate-700 hover:border-slate-600 transition-colors"
@@ -314,7 +317,7 @@ const IncidentList = ({ companyId, limit, refreshTrigger }) => {
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <Badge className={`text-xs ${getSeverityColor(incident.severity)} border`}>
                           {incident.severity}
                         </Badge>
@@ -324,6 +327,11 @@ const IncidentList = ({ companyId, limit, refreshTrigger }) => {
                         {incident.priority_score > 0 && (
                           <span className="text-xs text-slate-500">Priority: {Math.round(incident.priority_score)}</span>
                         )}
+                        {incident.category && (
+                          <Badge variant="outline" className="text-xs bg-purple-500/20 text-purple-300 border-purple-500/30">
+                            {incident.category}
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-sm font-medium text-white mb-1">
                         {incident.signature.replace(/_/g, ' ').replace(/:/g, ' - ')} on {incident.asset_name}
@@ -331,6 +339,39 @@ const IncidentList = ({ companyId, limit, refreshTrigger }) => {
                       <p className="text-xs text-slate-400">
                         {incident.alert_count} correlated alert{incident.alert_count > 1 ? 's' : ''}
                       </p>
+                      
+                      {/* Escalation & Assignment Info */}
+                      {(incident.escalated || incident.assigned_to) && (
+                        <div className="mt-2 pt-2 border-t border-slate-700/50 space-y-1">
+                          {incident.escalated && incident.escalated_at && (
+                            <div className="flex items-center gap-2 text-xs">
+                              <span className="text-amber-400">⚠️ Escalated</span>
+                              <span className="text-slate-500">
+                                {new Date(incident.escalated_at).toLocaleString()}
+                              </span>
+                              {incident.escalation_reason && (
+                                <span className="text-slate-400">• {incident.escalation_reason}</span>
+                              )}
+                            </div>
+                          )}
+                          {assignedTech && (
+                            <div className="flex items-center gap-2 text-xs">
+                              <span className="text-cyan-400">👤 Assigned to:</span>
+                              <span className="text-white font-medium">{assignedTech.name}</span>
+                              {assignedTech.category && (
+                                <Badge variant="outline" className="text-xs bg-cyan-500/10 text-cyan-300 border-cyan-500/30">
+                                  {assignedTech.category}
+                                </Badge>
+                              )}
+                              {incident.assigned_at && (
+                                <span className="text-slate-500">
+                                  • {new Date(incident.assigned_at).toLocaleString()}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <Button
                       onClick={() => viewDecision(incident)}
@@ -355,7 +396,7 @@ const IncidentList = ({ companyId, limit, refreshTrigger }) => {
                     </div>
                   )}
                 </div>
-              ))}
+              )})}
             </div>
           )}
         </CardContent>
